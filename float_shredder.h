@@ -113,6 +113,17 @@ uint32_t shredder_raw_mantissa_32(float input_float)
 	return shredder_raw_float_value_32(input_float) & float_mantissa_mask_32;
 }
 
+float shredder_mantissa_32(float input_float)
+{
+	if(shredder_exp_unbiased_32(input_float) > 0)
+	{
+		return shredder_raw_int_to_float_32
+			(shredder_raw_mantissa_32(input_float) + 1)
+	} else {
+		return shredder_raw_int_to_float_32
+			(shredder_raw_mantissa_32(input_float))
+	}
+
 bool shredder_is_negative_32(float input_float)
 {
 	return (shredder_raw_float_value_32(input_float) & float_sign_mask_32) >> 31;
@@ -128,7 +139,7 @@ float shredder_inc_shift_exp_32(float input_float, int shift)
 	uint32_t float_exp = shredder_raw_float_value_32(input_float) & float_exp_mask_32;
 	uint32_t float_no_exp = shredder_raw_float_value_32(input_float) & ~float_exp_mask_32;
 	return shredder_raw_int_to_float_32
-		(((float_exp >> shift) & float_exp_mask_32) | float_no_exp);
+		(((float_exp << shift) & float_exp_mask_32) | float_no_exp);
 }
 
 float shredder_dec_shift_exp_32(float input_float, int shift)
@@ -141,7 +152,7 @@ float shredder_dec_shift_exp_32(float input_float, int shift)
 	uint32_t float_exp = shredder_raw_float_value_32(input_float) & float_exp_mask_32;
 	uint32_t float_no_exp = shredder_raw_float_value_32(input_float) & ~float_exp_mask_32; 
 	return shredder_raw_int_to_float_32
-		(((float_exp << shift) & float_exp_mask_32) | float_no_exp);
+		(((float_exp >> shift) & float_exp_mask_32) | float_no_exp);
 }
 
 float shredder_inc_shift_mant_32(float input_float, int shift)
