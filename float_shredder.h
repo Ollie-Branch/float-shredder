@@ -96,14 +96,14 @@ uint32_t shredder_raw_exp_unbiased_32(float input_float)
 	return shredder_raw_float_value_32(input_float) & float_exp_mask_32;
 }
 
-uint32_t shredder_exp_biased_32(float input_float)
+int32_t shredder_exp_biased_32(float input_float)
 {
-	return shredder_exp_unbiased_32(input_float) - 127;
+	return (int32_t)shredder_exp_unbiased_32(input_float) - 127;
 }
 
 // I can't yet foresee a use for this function, but it didn't make sense to leave
 // it out.
-uint32_t shredder_raw_exp_biased_32(float input_float)
+int32_t shredder_raw_exp_biased_32(float input_float)
 {
 	return shredder_exp_biased_32(input_float) << exp_offset_32;
 }
@@ -118,11 +118,12 @@ float shredder_mantissa_32(float input_float)
 	if(shredder_exp_unbiased_32(input_float) > 0)
 	{
 		return shredder_raw_int_to_float_32
-			(shredder_raw_mantissa_32(input_float) + 1);
+			(shredder_raw_mantissa_32(input_float)) + 1;
 	} else {
 		return shredder_raw_int_to_float_32
 			(shredder_raw_mantissa_32(input_float));
 	}
+}
 
 bool shredder_is_negative_32(float input_float)
 {
