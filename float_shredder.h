@@ -118,10 +118,10 @@ float shredder_mantissa_32(float input_float)
 	if(shredder_exp_unbiased_32(input_float) > 0)
 	{
 		return shredder_raw_int_to_float_32
-			(shredder_raw_mantissa_32(input_float) + 1)
+			(shredder_raw_mantissa_32(input_float) + 1);
 	} else {
 		return shredder_raw_int_to_float_32
-			(shredder_raw_mantissa_32(input_float))
+			(shredder_raw_mantissa_32(input_float));
 	}
 
 bool shredder_is_negative_32(float input_float)
