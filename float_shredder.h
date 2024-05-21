@@ -46,10 +46,10 @@
 uint32_t float_exp_mask_32 =		0x7F800000;
 uint32_t float_sign_mask_32 =		0x80000000;
 uint32_t float_mantissa_mask_32 =	0x007FFFFF;
-exp_offset_32 = 23;
-sign_offset_32 = 31;
-exp_bias_32 = 127;
-exp_bias_64 = 1023;
+int exp_offset_32 = 23;
+int sign_offset_32 = 31;
+int exp_bias_32 = 127;
+int exp_bias_64 = 1023;
 
 
 
@@ -160,7 +160,7 @@ float shredder_inc_shift_mant_32(float input_float, int shift)
 
 }
 
-float shredder_inc_shift_mant_32(float input_float, int shift)
+float shredder_dec_shift_mant_32(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
 	if(shift > 23)
