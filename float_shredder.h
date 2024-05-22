@@ -43,15 +43,13 @@
 
 // tabbing the values of these so I can make sure they're all the
 // same width
-uint32_t float_exp_mask_32 =		0x7F800000;
-uint32_t float_sign_mask_32 =		0x80000000;
-uint32_t float_mantissa_mask_32 =	0x007FFFFF;
-int exp_offset_32 = 23;
-int sign_offset_32 = 31;
-int exp_bias_32 = 127;
-int exp_bias_64 = 1023;
-
-
+const uint32_t float_exp_mask_32 =		0x7F800000;
+const uint32_t float_sign_mask_32 =		0x80000000;
+const uint32_t float_mantissa_mask_32 =		0x007FFFFF;
+const int exp_offset_32 = 23;
+const int sign_offset_32 = 31;
+const int exp_bias_32 = 127;
+const int exp_bias_64 = 1023;
 
 /*
 	(Almost) Everything from here on will be composed with the raw float memory
