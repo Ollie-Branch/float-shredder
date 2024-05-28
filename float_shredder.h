@@ -67,7 +67,7 @@ const int double_exp_bias = 1023;
 	leave memory layout completely unaltered, which allows us to do our
 	magic.
 */
-uint32_t shredder_raw_float_data(float input_float) 
+uint32_t ShredFloatToData(float input_float) 
 {
 	void* input_float_mem = &input_float;
 	return *(uint32_t*)input_float_mem;
@@ -77,117 +77,117 @@ uint32_t shredder_raw_float_data(float input_float)
 	This is to get the raw data back into a float without dealing with C/C++
 	implicit conversion.
 */
-float shredder_raw_float_data_to_float(uint32_t input_int)
+float ShredDataToFloat(uint32_t input_int)
 {
 	void* input_int_mem = &input_int;
 	return *(float*)input_int_mem;
 }
 
-uint32_t shredder_float_exp_unbiased(float input_float)
+uint32_t ShredFloatExpUnbiased(float input_float)
 {
-	return (shredder_raw_float_data(input_float) & 
+	return (ShredFloatToData(input_float) & 
 		float_exp_mask) >> float_exp_offset;
 }
 
-uint32_t shredder_raw_float_exp_unbiased(float input_float)
+uint32_t ShredFloatExpUnbiasedRaw(float input_float)
 {
-	return shredder_raw_float_data(input_float) & float_exp_mask;
+	return ShredFloatToData(input_float) & float_exp_mask;
 }
 
-int32_t shredder_float_exp_biased(float input_float)
+int32_t ShredFloatExp(float input_float)
 {
-	return (int32_t)shredder_float_exp_unbiased(input_float) - 127;
+	return (int32_t)ShredFloatExpUnbiased(input_float) - 127;
 }
 
 // I can't yet foresee a use for this function, but it didn't make sense to leave
 // it out.
-int32_t shredder_raw_float_exp_biased(float input_float)
+int32_t ShredFloatExpRaw(float input_float)
 {
-	return shredder_float_exp_biased(input_float) << float_exp_offset;
+	return ShredFloatExp(input_float) << float_exp_offset;
 }
 
-uint32_t shredder_raw_float_mantissa(float input_float)
+uint32_t ShredFloatMantissaRaw(float input_float)
 {
-	return shredder_raw_float_data(input_float) & float_mantissa_mask;
+	return ShredFloatToData(input_float) & float_mantissa_mask;
 }
 
 // TODO: test
-float shredder_mantissa(float input_float)
+float ShredFloatMantissa(float input_float)
 {
-	if(shredder_float_exp_unbiased(input_float) > 0)
+	if(ShredFloatExpUnbiased(input_float) > 0)
 	{
-		return shredder_raw_float_data_to_float
-			(shredder_raw_float_mantissa(input_float)) + 1;
+		return ShredDataToFloat
+			(ShredFloatMantissaRaw(input_float)) + 1;
 	} else {
-		return shredder_raw_float_data_to_float
-			(shredder_raw_float_mantissa(input_float));
+		return ShredDataToFloat
+			(ShredFloatMantissaRaw(input_float));
 	}
 }
 
 // TODO: test
-bool shredder_is_negative(float input_float)
+bool ShredFloatIsNegative(float input_float)
 {
-	return (shredder_raw_float_data(input_float) & float_sign_mask) >> 31;
+	return (ShredFloatToData(input_float) & float_sign_mask) >> 31;
 }
 
 // TODO: test
-float shredder_inc_shift_exp(float input_float, int shift)
+float ShredFloatShiftExpUp(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
 	if(shift > 8)
 	{
 		shift -= (shift-8);
 	}
-	uint32_t float_exp = shredder_raw_float_data(input_float) & float_exp_mask;
-	uint32_t float_no_exp = shredder_raw_float_data(input_float) & ~float_exp_mask;
-	return shredder_raw_float_data_to_float
+	uint32_t float_exp = ShredFloatToData(input_float) & float_exp_mask;
+	uint32_t float_no_exp = ShredFloatToData(input_float) & ~float_exp_mask;
+	return ShredDataToFloat
 		(((float_exp << shift) & float_exp_mask) | float_no_exp);
 }
 
 // TODO: test
-float shredder_dec_shift_exp(float input_float, int shift)
+float ShredFloatShiftExpDown(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
 	if(shift > 8)
 	{
 		shift -= (shift-8);
 	}
-	uint32_t float_exp = shredder_raw_float_data(input_float) & float_exp_mask;
-	uint32_t float_no_exp = shredder_raw_float_data(input_float) & ~float_exp_mask; 
-	return shredder_raw_float_data_to_float
+	uint32_t float_exp = ShredFloatToData(input_float) & float_exp_mask;
+	uint32_t float_no_exp = ShredFloatToData(input_float) & ~float_exp_mask; 
+	return ShredDataToFloat
 		(((float_exp >> shift) & float_exp_mask) | float_no_exp);
 }
 
 // TODO: test
-float shredder_inc_shift_mant(float input_float, int shift)
+float ShredFloatShiftMantUp(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
 	if(shift > 23)
 	{
 		shift -= (shift-23);
 	}
-	uint32_t float_mant = shredder_raw_float_data(input_float) & float_mantissa_mask;
+	uint32_t float_mant = ShredFloatToData(input_float) & float_mantissa_mask;
 	uint32_t float_no_mant = 
-		shredder_raw_float_data(input_float) & ~float_mantissa_mask;
+		ShredFloatToData(input_float) & ~float_mantissa_mask;
 
-	return shredder_raw_float_data_to_float
+	return ShredDataToFloat
 		(((float_mant << shift) & float_mantissa_mask) | float_no_mant);
 
 }
 
 // TODO: test
-float shredder_dec_shift_mant(float input_float, int shift)
+float ShredFloatShiftMantDown(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
 	if(shift > 23)
 	{
 		shift -= (shift-23);
 	}
-	uint32_t float_mant = shredder_raw_float_data(input_float) & float_mantissa_mask;
+	uint32_t float_mant = ShredFloatToData(input_float) & float_mantissa_mask;
 	uint32_t float_no_mant = 
-		shredder_raw_float_data(input_float) & ~float_mantissa_mask;
+		ShredFloatToData(input_float) & ~float_mantissa_mask;
 
-	return shredder_raw_float_data_to_float
+	return ShredDataToFloat
 		(((float_mant >> shift) & float_mantissa_mask) | float_no_mant);
 
 }
