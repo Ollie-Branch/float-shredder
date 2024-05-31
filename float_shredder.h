@@ -67,7 +67,7 @@ const int double_exp_bias = 1023;
 	leave memory layout completely unaltered, which allows us to do our
 	magic.
 */
-uint32_t ShredFloatToData(float input_float) 
+inline uint32_t ShredFloatToData(float input_float) 
 {
 	void* input_float_mem = &input_float;
 	return *(uint32_t*)input_float_mem;
@@ -77,42 +77,42 @@ uint32_t ShredFloatToData(float input_float)
 	This is to get the raw data back into a float without dealing with C/C++
 	implicit conversion.
 */
-float ShredDataToFloat(uint32_t input_int)
+inline float ShredDataToFloat(uint32_t input_int)
 {
 	void* input_int_mem = &input_int;
 	return *(float*)input_int_mem;
 }
 
-uint32_t ShredFloatExpUnbiased(float input_float)
+inline uint32_t ShredFloatExpUnbiased(float input_float)
 {
 	return (ShredFloatToData(input_float) & 
 		float_exp_mask) >> float_exp_offset;
 }
 
-uint32_t ShredFloatExpUnbiasedRaw(float input_float)
+inline uint32_t ShredFloatExpUnbiasedRaw(float input_float)
 {
 	return ShredFloatToData(input_float) & float_exp_mask;
 }
 
-int32_t ShredFloatExp(float input_float)
+inline int32_t ShredFloatExp(float input_float)
 {
 	return (int32_t)ShredFloatExpUnbiased(input_float) - 127;
 }
 
 // I can't yet foresee a use for this function, but it didn't make sense to leave
 // it out.
-int32_t ShredFloatExpRaw(float input_float)
+inline int32_t ShredFloatExpRaw(float input_float)
 {
 	return ShredFloatExp(input_float) << float_exp_offset;
 }
 
-uint32_t ShredFloatMantissaRaw(float input_float)
+inline uint32_t ShredFloatMantissaRaw(float input_float)
 {
 	return ShredFloatToData(input_float) & float_mantissa_mask;
 }
 
 // TODO: test
-float ShredFloatMantissa(float input_float)
+inline float ShredFloatMantissa(float input_float)
 {
 	if(ShredFloatExpUnbiased(input_float) > 0)
 	{
@@ -125,15 +125,16 @@ float ShredFloatMantissa(float input_float)
 }
 
 // TODO: test
-bool ShredFloatIsNegative(float input_float)
+inline bool ShredFloatIsNegative(float input_float)
 {
 	return (ShredFloatToData(input_float) & float_sign_mask) >> 31;
 }
 
 // TODO: test
-float ShredFloatShiftExpUp(float input_float, int shift)
+inline float ShredFloatShiftExpUp(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
+	// TODO implement proper overflow prevention
 	if(shift > 8)
 	{
 		shift -= (shift-8);
@@ -145,9 +146,10 @@ float ShredFloatShiftExpUp(float input_float, int shift)
 }
 
 // TODO: test
-float ShredFloatShiftExpDown(float input_float, int shift)
+inline float ShredFloatShiftExpDown(float input_float, int shift)
 {
-	// this isn't enough to prevent overflows but it'll do for now
+	// this isn't enough to prevent underflows but it'll do for now
+	// TODO implement proper underflow prevention
 	if(shift > 8)
 	{
 		shift -= (shift-8);
@@ -159,9 +161,10 @@ float ShredFloatShiftExpDown(float input_float, int shift)
 }
 
 // TODO: test
-float ShredFloatShiftMantUp(float input_float, int shift)
+inline float ShredFloatShiftMantUp(float input_float, int shift)
 {
 	// this isn't enough to prevent overflows but it'll do for now
+	// TODO implement proper overflow prevention
 	if(shift > 23)
 	{
 		shift -= (shift-23);
@@ -176,9 +179,10 @@ float ShredFloatShiftMantUp(float input_float, int shift)
 }
 
 // TODO: test
-float ShredFloatShiftMantDown(float input_float, int shift)
+inline float ShredFloatShiftMantDown(float input_float, int shift)
 {
-	// this isn't enough to prevent overflows but it'll do for now
+	// this isn't enough to prevent underflows but it'll do for now
+	// TODO implement proper underflow prevention
 	if(shift > 23)
 	{
 		shift -= (shift-23);
