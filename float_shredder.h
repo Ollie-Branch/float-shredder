@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 
 /*
 	The float shredder library is a header only library to destroy
@@ -46,10 +47,10 @@
 const uint32_t float_exp_mask =			0x7F800000;
 const uint32_t float_sign_mask =		0x80000000;
 const uint32_t float_mantissa_mask =		0x007FFFFF;
-const int float_exp_offset = 23;
-const int float_sign_offset = 31;
-const int float_exp_bias = 127;
-const int double_exp_bias = 1023;
+const int float_exp_offset = 			23;
+const int float_sign_offset = 			31;
+const int float_exp_bias = 			127;
+const int double_exp_bias = 			1023;
 
 /*
 	(Almost) Everything from here on will be composed with the raw float memory
@@ -69,18 +70,20 @@ const int double_exp_bias = 1023;
 */
 inline uint32_t ShredFloatToData(float input_float) 
 {
-	void* input_float_mem = &input_float;
-	return *(uint32_t*)input_float_mem;
+	uint32_t output_mem;
+	memcpy(&output_mem, &input_float, sizeof(input_float));
+	return output_mem;
 }
 
 /*
 	This is to get the raw data back into a float without dealing with C/C++
 	implicit conversion.
 */
-inline float ShredDataToFloat(uint32_t input_int)
+inline float ShredDataToFloat(uint32_t input_data)
 {
-	void* input_int_mem = &input_int;
-	return *(float*)input_int_mem;
+	float output_float;
+	memcpy(&output_float, &input_data, sizeof(input_data));
+	return output_float;
 }
 
 inline uint32_t ShredFloatExpUnbiased(float input_float)
@@ -99,8 +102,8 @@ inline int32_t ShredFloatExp(float input_float)
 	return (int32_t)ShredFloatExpUnbiased(input_float) - 127;
 }
 
-// I can't yet foresee a use for this function, but it didn't make sense to leave
-// it out.
+// I can't yet foresee a use for this function, but it didn't make sense to
+// leave it out.
 inline int32_t ShredFloatExpRaw(float input_float)
 {
 	return ShredFloatExp(input_float) << float_exp_offset;
